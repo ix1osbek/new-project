@@ -1,7 +1,10 @@
 import { Router } from "express"
 const router = Router()
 router.get("/", (req, res) => {
-    res.render("index")
+    res.render("index", {
+        title: "Erkinov SHOP",
+        token: true
+    })
 
 })
 
@@ -13,8 +16,8 @@ router.get("/products", (req, res) => {
 })
 
 router.get("/add", (req, res) => {
-    res.render("add" , {
-        title: "add" , 
+    res.render("add", {
+        title: "add",
         isAdd: true
     })
 })
