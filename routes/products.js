@@ -1,9 +1,11 @@
 import { Router } from "express"
 const router = Router()
 router.get("/", (req, res) => {
+    const token = req.cookies.token; // Cookie'dan tokenni olish
+    const isLoggedIn = token ? true : false;
     res.render("index", {
         title: "Erkinov SHOP",
-        token: true
+        token: isLoggedIn
     })
 
 })
