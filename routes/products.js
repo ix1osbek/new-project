@@ -1,12 +1,16 @@
 import { Router } from "express"
 import Product from "../models/Product.js";
+import authMiddleware from "../middleware/auth.js";
+import usermiddleware from "../middleware/user.js";
 const router = Router()
-router.get("/", (req, res) => {
+router.get("/", async (req, res) => {
+    const products = await Product.find().lean()
     const token = req.cookies.token
     const isLoggedIn = token ? true : false;
     res.render("index", {
         title: "Erkinov SHOP",
-        token: isLoggedIn
+        token: isLoggedIn,
+        products: products,
     })
 
 })
@@ -18,18 +22,25 @@ router.get("/products", (req, res) => {
     })
 })
 
-router.get("/add", (req, res) => {
+router.get("/add", authMiddleware, (req, res) => {
+
     res.render("add", {
         title: "add",
-        isAdd: true
+        isAdd: true,
+        erroraddProducts: req.flash("erroraddProducts")
     })
 })
 
-router.post("/add-products", async (req, res) => {
+router.post("/add-products", usermiddleware, async (req, res) => {
     const { title, description, image, price } = req.body
-    const products = await Product.create(req.body)
-    console.log(products);
-    
+    if (!title || !description || !image || !price) {
+        req.flash("erroraddProducts", "Iltimos barcha bo'sh joylar to'ldirilishi shart!")
+        res.redirect("/add")
+        return
+    }
+    await Product.create({ ...req.body, user: req.userId })
+
+
     res.redirect("/")
 
 })
